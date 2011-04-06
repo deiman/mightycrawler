@@ -16,6 +16,8 @@ Description
 
 Mightycrawler is a multithreaded web crawler with reporting capabilities. The code is structured as a multi-stage queue system where downloading, parsing and storing content is done by separate thread pools. Various statistics about the site performance is gathered during crawling and put in a RAM database. After completion, the database can be queried to produce various reports. The database is not persistent between runs.
 
+Warning! Mightycrawler is indeed mighty and can generate a lot of requests in short time. Please do use the program properly.
+
 
 Quick start
 -----------
@@ -54,7 +56,7 @@ All options for running mightycrawler are given in the crawler.properties file:
 
 * userAgent: The user agent the crawler identifies itself as.
 
-* defaultPage: When storing storing pages to disk, any page URLs ending with "/" will have the string given here appended to the path. Else the URL would map to a file system directory (thus no content could be stored there).
+* defaultPage: When storing pages to disk, URLs ending with "/" are appended with the file name given here. The URL would else map to a directory name - making storage impossible.
 
 * defaultEncoding: Use this encoding to store content unless content-type is specified in the HTTP response header.
 
