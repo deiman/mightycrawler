@@ -16,7 +16,7 @@ Description
 
 Mightycrawler is a multithreaded web crawler with reporting capabilities. The code is structured as a multi-stage queue system where downloading, parsing and storing content is done by separate thread pools. Various statistics about the site performance is gathered during crawling and put in a RAM database. After completion, the database can be queried to produce various reports. The database is not persistent between runs.
 
-*Warning!* Mightycrawler is indeed mighty and can generate a lot of requests in short time. Please do use the program properly.
+**Warning!** Mightycrawler is indeed mighty and can generate a lot of requests in short time. Please do use the program properly.
 
 
 Quick start
