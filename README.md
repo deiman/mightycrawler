@@ -1,5 +1,5 @@
-Mightycrawler - A Java queue based multithreaded web crawler
-==================================================================
+Mightycrawler - A queue based multithreaded web crawler written in Java
+=======================================================================
 
 Getting it
 -----------
@@ -32,50 +32,71 @@ Configuration
 
 All options for running mightycrawler are given in the crawler.properties file:
 
-	startURL: Where to start crawling. URL must end with a "/".
+* startURL
+Where to start crawling. URL must end with a "/".
 
-	includeURL: Restrict crawling and downloading to URLs matching this regex. Defaults to everything under startURL.
+* includeURL
+Restrict crawling and downloading to URLs matching this regex. Defaults to everything under startURL.
 
-	excludeURL: Among the included URLs, exclude any matching this regex. Defaults to none (don't exclude any).
+* excludeURL
+Among the included URLs, exclude any matching this regex. Defaults to none (don't exclude any).
 
-	includeLinkExtraction: Restrict link extraction to content types matching this regex. Defaults to none (if nothing is specified).
+* includeLinkExtraction
+Restrict link extraction to content types matching this regex. Defaults to none (if nothing is specified).
 
-	excludeLinkExtraction: Among the included content types, do not perform link extraction on content types matching this regex. Defaults to none (don't exclude any).
+* excludeLinkExtraction
+Among the included content types, do not perform link extraction on content types matching this regex. Defaults to none (don't exclude any).
 
-	includeContent: Restrict downloading to content types matching this regex. Defaults to none (if nothing is specified).
+* includeContent
+Restrict downloading to content types matching this regex. Defaults to none (if nothing is specified).
 
-	excludeContent: Among the included content types, exclude any matching this regex. defaults to none (don't exclude any).
+* excludeContent:
+Among the included content types, exclude any matching this regex. defaults to none (don't exclude any).
 
-	includeBinaryFile: Content at URLs having content types matching this regex pattern is not downloaded and not parsed - instead the URLs are gathered in a separate file for possible later processing. Only URLs matching the link extraction filter will be considered. Also, only links that are found inside href attributes will be found.
+* includeBinaryFile
+Content at URLs having content types matching this regex pattern is not downloaded and not parsed - instead the URLs are gathered in a separate file for possible later processing. Only URLs matching the link extraction filter will be considered. Also, only links that are found inside href attributes will be found.
 
-	excludeBinaryFile: Among the included content types, exclude any matching this regex. Defaults to none (don't exclude any).
+* excludeBinaryFile
+Among the included content types, exclude any matching this regex. Defaults to none (don't exclude any).
 
-	binariesFile: URLs to binary files will be gathered in this file. If the name is blank no file will be generated.
+* binariesFile
+URLs to binary files will be gathered in this file. If the name is blank no file will be generated.
 
-	userAgent: The user agent the crawler identifies itself as.
+* userAgent
+The user agent the crawler identifies itself as.
 
-	defaultPage: When storing storing pages to disk, any page URLs ending with "/" will have the string given here appended to the path. Else the URL would map to a file system directory (thus no content could be stored there).
+* defaultPage
+When storing storing pages to disk, any page URLs ending with "/" will have the string given here appended to the path. Else the URL would map to a file system directory (thus no content could be stored there).
 
-	defaultEncoding: Use this encoding to store content unless content-type is specified in the HTTP response header.
+* defaultEncoding
+Use this encoding to store content unless content-type is specified in the HTTP response header.
 
-	downloadThreads: Number of threads for downloading.
+* downloadThreads
+Number of threads for downloading.
 
-	parseThreads: Number of threads for parsing content, looking for URLs.
+* parseThreads
+Number of threads for parsing content, looking for URLs.
 
-	saveThreads: Number of threads used for saving content to disk.
+* saveThreads
+Number of threads used for saving content to disk.
 
-	maxPages: Stop after downloading this number of pages.
+* maxPages
+Stop after downloading this number of pages.
 
-	downloadDelay: Each download thread waits this number of seconds before it starts.
+* downloadDelay
+Each download thread waits this number of seconds before it starts.
 
-	crawlerTimeout: Stop crawling if no new URLs are discovered within this number of seconds.
+* crawlerTimeout
+Stop crawling if no new URLs are discovered within this number of seconds.
 
-	outputDirectory: Where to put the downloaded web pages. MANDATORY.
+* outputDirectory
+Where to put the downloaded web pages. MANDATORY.
 
-	reportDirectory: Where to put download statistics. MANDATORY.
+* reportDirectory
+Where to put download statistics. MANDATORY.
 
-	reportSQL: SQL statements that are run against the crawler database after completion. Output is sent to the filename specified. 
-	Syntax: SQL1@reportfile1.txt|SQL2@reportfile2.txt|....
+* reportSQL
+SQL statements that are run against the crawler database after completion. Output is sent to the filename specified. Syntax: SQL1@reportfile1.txt|SQL2@reportfile2.txt|....
 
 
 Tables in the crawler database
