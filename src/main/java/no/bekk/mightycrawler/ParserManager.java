@@ -29,7 +29,7 @@ public class ParserManager extends Thread {
 		this.d = d;
 		this.r = r;
 
-		urlManager = new URLManager(c.urlFilter);
+		urlManager = new URLManager(c.crawlFilter);
 		workerService = Executors.newFixedThreadPool(c.parseThreads);
 		completionService = new ExecutorCompletionService<LinkHolder>(workerService);
 	}

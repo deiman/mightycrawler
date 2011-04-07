@@ -46,7 +46,7 @@ public class Report {
 		String timeString = sdf.format(res.timeStamp);
 		// TODO: Escaping
 		write("INSERT INTO downloads (url, http_code, response_time, downloaded_at, downloaded) values ('" 
-				+ res.url + "', " + res.responseCode + ", " + res.responseTime + ", '" + timeString + "', " + res.hasContent() + ")");
+				+ res.url + "', " + res.responseCode + ", " + res.responseTime + ", '" + timeString + "', " + res.doStore + ")");
 	}
 
 	public void registerOutboundLinks(String url, Collection<String> outlinks) {

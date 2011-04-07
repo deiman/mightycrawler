@@ -76,20 +76,22 @@ public class DownloadWorker implements Callable<Resource> {
     }
 
     public void handleContent(HttpEntity entity, Resource res) {
-    	// TODO: handle link extraction (HTML, Flash, JS) vs content download (HTML)
+    	res.doStore = c.storeFilter.letsThrough(res.contentType);
+    	res.doParse = c.extractLinkFilter.letsThrough(res.contentType);
+    	res.doCollect = c.collectURLFilter.letsThrough(res.contentType);
     	
-    	if (c.linkExtractionFilter.letsThrough(res.contentType)) {
-	    	log.debug("Content-type matched extraction filter. Processing html at " + url + " with encoding " + res.encoding);
+    	if (res.doStore || res.doParse) {
 	    	try {
 	    		res.content = EntityUtils.toString(entity, res.encoding);
 	    	} catch (Exception e) {
 	    		log.error(e);
 	    	}
-		}
-		if (c.binaryFilter.letsThrough(res.contentType)) {
-	    	log.debug("Content-type matched binary file filter. Adding " + url + " to list of URLs to index later.");
-	    	addURLToFile(c.binariesFile, url);
-		}
+    	}
+
+    	if (res.doCollect) {
+	    	log.debug("Content-type matched URL collection filter. Adding " + url + " to file containing list of URLs.");
+	    	addURLToFile(c.listFile, url);    		
+    	}
 	}
 
 	public void addURLToFile(String fileName, String url) {

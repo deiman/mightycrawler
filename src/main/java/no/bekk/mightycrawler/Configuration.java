@@ -14,17 +14,17 @@ import org.apache.log4j.Logger;
 public class Configuration {
 
 	public String startURL = "";
-	public String includeURL = "";
-	public String excludeURL = "";
+	public String includeCrawl = "";
+	public String excludeCrawl = "";
 
-	public String includeContent = "";
-	public String excludeContent = "";
+	public String includeStore = "";
+	public String excludeStore = "";
 	
-	public String includeLinkExtraction = "";
-	public String excludeLinkExtraction = "";
+	public String includeExtractLink = "";
+	public String excludeExtractLink = "";
 
-	public String includeBinaryFile = "";
-	public String excludeBinaryFile = "";
+	public String includeCollectURL = "";
+	public String excludeCollectURL = "";
 
 	public String userAgent = "";
 	public String defaultPage = "";	
@@ -42,16 +42,16 @@ public class Configuration {
 	public int downloadTimeout;
 	public int crawlerTimeout;
 
-	public String binariesFile = "";
+	public String listFile = "";
 	public String outputDirectory = "";
 	public String reportDirectory = "";
 
 	public Collection<String> reportSQL = new ArrayList<String>();
 
-	public IncludeExcludeFilter urlFilter;
-	public IncludeExcludeFilter contentFilter;
-	public IncludeExcludeFilter linkExtractionFilter;
-	public IncludeExcludeFilter binaryFilter;
+	public IncludeExcludeFilter crawlFilter;
+	public IncludeExcludeFilter storeFilter;
+	public IncludeExcludeFilter extractLinkFilter;
+	public IncludeExcludeFilter collectURLFilter;
 	
 	static final Logger log = Logger.getLogger(Configuration.class);
 		
@@ -72,17 +72,17 @@ public class Configuration {
 				httpPort = port;
 			}
 				
-			includeURL = p.getProperty("includeURL", startURL + "(.*)");
-			excludeURL = p.getProperty("excludeURL");
+			includeCrawl = p.getProperty("includeCrawl", startURL + "(.*)");
+			excludeCrawl = p.getProperty("excludeCrawl", "");
 
-			includeContent = p.getProperty("includeContent");
-			excludeContent = p.getProperty("excludeContent");
+			includeStore = p.getProperty("includeStore");
+			excludeStore = p.getProperty("excludeStore", "");
 			
-			includeLinkExtraction = p.getProperty("includeLinkExtraction");
-			excludeLinkExtraction = p.getProperty("excludeLinkExtraction");
+			includeExtractLink = p.getProperty("includeExtractLink");
+			excludeExtractLink = p.getProperty("excludeExtractLink", "");
 
-			includeBinaryFile = p.getProperty("includeBinaryFile");
-			excludeBinaryFile = p.getProperty("excludeBinaryFile");
+			includeCollectURL= p.getProperty("includeCollectURL");
+			excludeCollectURL = p.getProperty("excludeCollectURL", "");
 			
 			userAgent = p.getProperty("userAgent", "");
 			defaultPage = p.getProperty("defaultPage", "index.html");
@@ -97,16 +97,16 @@ public class Configuration {
 			downloadTimeout = Integer.parseInt(p.getProperty("downloadTimeout", "10"));		
 			crawlerTimeout = Integer.parseInt(p.getProperty("crawlerTimeout", "30"));
 
-			binariesFile = p.getProperty("binariesFile");
+			listFile = p.getProperty("listFile", "");
 			outputDirectory = p.getProperty("outputDirectory", System.getProperty("java.io.tmpdir"));
 			reportDirectory = p.getProperty("reportDirectory", System.getProperty("java.io.tmpdir"));
 			
 			reportSQL = Arrays.asList(p.getProperty("reportSQL").split("\\|"));
 			
-			urlFilter = new IncludeExcludeFilter(includeURL, excludeURL);
-			contentFilter = new IncludeExcludeFilter(includeContent, excludeContent);	
-			linkExtractionFilter = new IncludeExcludeFilter(includeLinkExtraction, excludeLinkExtraction);	
-			binaryFilter = new IncludeExcludeFilter(includeBinaryFile, excludeBinaryFile);
+			crawlFilter = new IncludeExcludeFilter(includeCrawl, excludeCrawl);
+			storeFilter = new IncludeExcludeFilter(includeStore, excludeStore);	
+			extractLinkFilter = new IncludeExcludeFilter(includeExtractLink, excludeExtractLink);	
+			collectURLFilter = new IncludeExcludeFilter(includeCollectURL, excludeCollectURL);
 			
 		} catch (IOException ioe) {
 			System.err.println("\nError reading configuration file: " + ioe.getMessage());
@@ -123,3 +123,4 @@ public class Configuration {
 		}
 	}	
 }
+

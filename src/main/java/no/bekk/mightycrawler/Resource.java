@@ -16,13 +16,13 @@ public class Resource {
 //	public Date expires = new Date();
 //	public String ETag = "";
 //	public Date lastModified = new Date();
-		
+
+	public boolean doStore = false;
+	public boolean doCollect = false;
+	public boolean doParse = false;
+	
 	public Resource(String url) {
 		this.url = url;
-	}
-		
-	public boolean hasContent() {
-		return (content != null && content.length() > 0);
 	}
 }
 

@@ -95,11 +95,13 @@ public class DownloadManager extends Thread {
 					Resource res = result.get();
 					log.debug("Has processed URL: " + res.url);	
 					r.registerDownload(res);
-					if (res.hasContent()) {
+					if (res.doStore) {
 						s.addToQueue(res);
-						p.addToQueue(res);
-						urlsDownloaded++;
 					}
+					if (res.doParse) {
+						p.addToQueue(res);
+					}
+					urlsDownloaded++;
 					queueSize--;
 				} else {
 					log.info("Stopping, reached crawlerTimeout.");
