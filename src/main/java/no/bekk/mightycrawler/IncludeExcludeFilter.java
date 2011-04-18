@@ -1,22 +1,18 @@
 package no.bekk.mightycrawler;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.commons.lang.StringUtils;
 
 public class IncludeExcludeFilter {
 	private Pattern includeFilter;
 	private Pattern excludeFilter;
 	
+	// TODO: Collapse include/exclude-patterns
 	public IncludeExcludeFilter(String include, String exclude) {
 		includeFilter = Pattern.compile(include);
 		excludeFilter = Pattern.compile(exclude);
-	}
-	
-	public IncludeExcludeFilter(Collection<String> include, Collection<String> exclude) {
-		this(StringUtils.join(include, "|"), StringUtils.join(exclude, "|"));
 	}
 	
 	public boolean letsThrough(String item) {
@@ -28,5 +24,20 @@ public class IncludeExcludeFilter {
 	    	}
     	}
 	    return false;
+	}
+	
+	public Collection<String> getMatches(String content) {
+		Collection<String> matchList = new HashSet<String>();
+		Matcher matcher = includeFilter.matcher(content);
+		while (matcher.find()) {
+			int i=1;
+			while (i <= matcher.groupCount()) {
+				if (matcher.group(i) != null) {
+					matchList.add(matcher.group(i));				
+				}
+				i++;
+			}
+		}
+		return matchList;
 	}
 }

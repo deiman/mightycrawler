@@ -1,5 +1,9 @@
 package no.bekk.mightycrawler;
 
+import java.io.File;
+import java.io.IOException;
+
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -21,8 +25,17 @@ public class Crawler {
 		storage = new StorageManager(config);
 		download = new DownloadManager(config, report, storage);
 		parse = new ParserManager(config, download, report);
+		
+		try {
+			FileUtils.deleteDirectory(new File(config.outputDirectory));
+			FileUtils.deleteDirectory(new File(config.reportDirectory));
+
+			new File(config.outputDirectory).mkdirs();
+			new File(config.reportDirectory).mkdirs();
+		} catch (IOException ioe) {
+			log.error("Could not empty directory: " + ioe);
+		}
 	}
-	
 	
 	public void start() {
 		log.info("Crawling starts...");
@@ -33,7 +46,9 @@ public class Crawler {
 		storage.start();
  		download.start(); 		
 
- 		download.addToQueue(config.startURL);
+ 		Resource res = new Resource(config.startURL);
+ 		res.recursionLevel = 0;
+ 		download.addToQueue(res);
 
  		while (!download.isTerminated()) {
  			try {
@@ -41,10 +56,10 @@ public class Crawler {
 			} catch (Exception e) {
 	 			log.error("Main thread sleep interrupted.");
 			}
-			log.info("Downloaded URLs: " + download.urlsDownloaded);
- 			log.info("Download queue size: " + download.queueSize);
- 			log.info("Parse queue size: " + parse.queueSize);
- 			log.info("Storage queue size: " + storage.queueSize);
+			log.info("Downloaded resources: " + download.urlsDownloaded);
+ 			log.info("Download queue size: " + download.getQueueSize());
+ 			log.info("Parse queue size: " + parse.getQueueSize());
+ 			log.info("Storage queue size: " + storage.getQueueSize());
  		}
  		
  		try {

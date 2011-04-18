@@ -16,15 +16,11 @@ public class Configuration {
 	public String startURL = "";
 	public String includeCrawl = "";
 	public String excludeCrawl = "";
-
-	public String includeStore = "";
-	public String excludeStore = "";
 	
-	public String includeExtractLink = "";
-	public String excludeExtractLink = "";
-
-	public String includeCollectURL = "";
-	public String excludeCollectURL = "";
+	public String extract = "";
+	public String link = "";
+	public String store = "";
+	public String collect = "";
 
 	public String userAgent = "";
 	public String defaultPage = "";	
@@ -38,8 +34,9 @@ public class Configuration {
 	public boolean isWindows = File.separator.equals("\\");
 
 	public int maxPages;
+	public int maxRecursion;
 	public int downloadDelay;
-	public int downloadTimeout;
+	public int responseTimeout;
 	public int crawlerTimeout;
 
 	public String listFile = "";
@@ -49,9 +46,9 @@ public class Configuration {
 	public Collection<String> reportSQL = new ArrayList<String>();
 
 	public IncludeExcludeFilter crawlFilter;
+	public IncludeExcludeFilter extractFilter;
+	public IncludeExcludeFilter linkFilter;
 	public IncludeExcludeFilter storeFilter;
-	public IncludeExcludeFilter extractLinkFilter;
-	public IncludeExcludeFilter collectURLFilter;
 	
 	static final Logger log = Logger.getLogger(Configuration.class);
 		
@@ -75,14 +72,10 @@ public class Configuration {
 			includeCrawl = p.getProperty("includeCrawl", startURL + "(.*)");
 			excludeCrawl = p.getProperty("excludeCrawl", "");
 
-			includeStore = p.getProperty("includeStore");
-			excludeStore = p.getProperty("excludeStore", "");
-			
-			includeExtractLink = p.getProperty("includeExtractLink");
-			excludeExtractLink = p.getProperty("excludeExtractLink", "");
-
-			includeCollectURL= p.getProperty("includeCollectURL");
-			excludeCollectURL = p.getProperty("excludeCollectURL", "");
+			extract = p.getProperty("extract", "");
+			link =  p.getProperty("link", "");
+			store = p.getProperty("store", "");
+			collect = p.getProperty("collect", "");
 			
 			userAgent = p.getProperty("userAgent", "");
 			defaultPage = p.getProperty("defaultPage", "index.html");
@@ -93,8 +86,9 @@ public class Configuration {
 			saveThreads = Integer.parseInt(p.getProperty("saveThreads", "1"));
 				
 			maxPages = Integer.parseInt(p.getProperty("maxPages", "1"));
+			maxRecursion = Integer.parseInt(p.getProperty("maxRecursion", "1"));
 			downloadDelay = Integer.parseInt(p.getProperty("downloadDelay", "5"));		
-			downloadTimeout = Integer.parseInt(p.getProperty("downloadTimeout", "10"));		
+			responseTimeout = Integer.parseInt(p.getProperty("responseTimeout", "10"));		
 			crawlerTimeout = Integer.parseInt(p.getProperty("crawlerTimeout", "30"));
 
 			listFile = p.getProperty("listFile", "");
@@ -104,9 +98,9 @@ public class Configuration {
 			reportSQL = Arrays.asList(p.getProperty("reportSQL").split("\\|"));
 			
 			crawlFilter = new IncludeExcludeFilter(includeCrawl, excludeCrawl);
-			storeFilter = new IncludeExcludeFilter(includeStore, excludeStore);	
-			extractLinkFilter = new IncludeExcludeFilter(includeExtractLink, excludeExtractLink);	
-			collectURLFilter = new IncludeExcludeFilter(includeCollectURL, excludeCollectURL);
+			extractFilter = new IncludeExcludeFilter(extract, "");
+			linkFilter = new IncludeExcludeFilter(link, "");
+			storeFilter = new IncludeExcludeFilter(store, "");
 			
 		} catch (IOException ioe) {
 			System.err.println("\nError reading configuration file: " + ioe.getMessage());

@@ -8,6 +8,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -15,13 +16,12 @@ import org.apache.commons.logging.LogFactory;
 public class ParserManager extends Thread {
 
 	private ExecutorService workerService = null;
-	private CompletionService<LinkHolder> completionService = null;
+	private CompletionService<Resource> completionService = null;
 	private URLManager urlManager;
+	private IncludeExcludeFilter linkFilter = null;
 	
 	private DownloadManager d;
 	private Report r;
-	
-	public int queueSize;
 	
 	static final Log log = LogFactory.getLog(ParserManager.class);
 
@@ -29,29 +29,33 @@ public class ParserManager extends Thread {
 		this.d = d;
 		this.r = r;
 
+		linkFilter = c.linkFilter;
 		urlManager = new URLManager(c.crawlFilter);
 		workerService = Executors.newFixedThreadPool(c.parseThreads);
-		completionService = new ExecutorCompletionService<LinkHolder>(workerService);
+		completionService = new ExecutorCompletionService<Resource>(workerService);
 	}
 
 	public void addToQueue(Resource res) {
-		completionService.submit(new RegexpParserWorker(res.content, res.url));
+		completionService.submit(new ParserWorker(res, linkFilter));
 		log.debug("Added parsing of " + res.url + " to queue.");
-		queueSize++;
 	}
 
+	public int getQueueSize() {
+		return ((ThreadPoolExecutor) workerService).getQueue().size();
+	}
+
+	
 	public void run() {
 		while (!workerService.isShutdown()) {
 			try {
-				Future<LinkHolder> result = completionService.take();
+				Future<Resource> result = completionService.take();
 			
-				LinkHolder l = result.get();			
-				log.debug("Done parsing " + l.url);
+				Resource res = result.get();			
+				log.debug("Done parsing " + res.url);
 
-				Collection<String> newURLs = urlManager.updateQueues(l);
-				d.addToQueue(newURLs);
-				r.registerOutboundLinks(l.url, newURLs);
-				queueSize--;
+				Collection<String> newURLs = urlManager.updateQueues(res);
+				d.addToQueue(newURLs, res.recursionLevel+1);
+				r.registerOutboundLinks(res.url, newURLs);
 			} catch (RejectedExecutionException ree) {
 	        	// This exception is harmless here. Do nothing.
 			} catch (InterruptedException e) {

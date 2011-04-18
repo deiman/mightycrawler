@@ -14,7 +14,7 @@ Warning: Mightycrawler is experimental. Some features are not fully implemented.
 Description
 -----------
 
-Mightycrawler is a multithreaded web crawler with reporting capabilities. The code is structured as a multi-stage queue system where downloading, parsing and storing content is done by separate thread pools. Various statistics about the site performance is gathered during crawling and put in a RAM database. After completion, the database can be queried to produce various reports. The database is not persistent between runs.
+Mightycrawler is a multithreaded web crawler with reporting capabilities. The code is structured as a multi-stage queue system where downloading, parsing and storing content is done by separate thread pools. Various statistics about the site performance is gathered during crawling and put in a database. After completion, the database can be queried to produce various reports. The database is stored in RAM and is not persistent between runs.
 
 **Warning!** Mightycrawler is indeed mighty and can generate a lot of requests in short time. Please do use the program properly.
 
@@ -26,7 +26,7 @@ After downloading and building, edit crawler.properties to suit your needs.
 
 Then run mightycrawler by typing
 
-	java -jar mightycrawler.jar
+	java -jar mightycrawler.jar [myconfig.properties]
 
 
 Configuration
@@ -40,19 +40,11 @@ All options for running mightycrawler are given in the crawler.properties file:
 
 * excludeURL: Among the included URLs, exclude any matching this regex. Defaults to none (don't exclude any).
 
-* includeLinkExtraction: Restrict link extraction to content types matching this regex. Defaults to none (if nothing is specified).
+* extract: Restrict link extraction to content types matching this regex. Defaults to none (if nothing is specified).
 
-* excludeLinkExtraction: Among the included content types, do not perform link extraction on content types matching this regex. Defaults to none (don't exclude any).
+* link: Consinder content matching this regex as a link to a resource. Defaults to none (if nothing is specified).
 
-* includeContent: Restrict downloading to content types matching this regex. Defaults to none (if nothing is specified).
-
-* excludeContent: Among the included content types, exclude any matching this regex. defaults to none (don't exclude any).
-
-* includeBinaryFile: Content types matching this regex pattern are not downloaded and not parsed - instead the URLs are gathered in a separate file for possible later processing. Only URLs matching the link extraction filter will be considered. Also, only links that are found inside href attributes will be discovered.
-
-* excludeBinaryFile: Among the included content types, exclude any matching this regex. Defaults to none (don't exclude any).
-
-* binariesFile: URLs to binary files will be gathered in this file. If the name is blank no file will be generated.
+* store: Restrict downloading to content types matching this regex. Defaults to none (if nothing is specified).
 
 * userAgent: The user agent the crawler identifies itself as.
 
@@ -67,6 +59,8 @@ All options for running mightycrawler are given in the crawler.properties file:
 * saveThreads: Number of threads used for saving content to disk.
 
 * maxPages: Stop after downloading this number of pages.
+
+* maxRecursion: Stop when reaching this recursion level.
 
 * downloadDelay: Each download thread waits this number of seconds before it starts.
 
@@ -89,7 +83,8 @@ LINKS
 url_from VARCHAR(4095) | url_to VARCHAR(4095)
 
 
-Todo
-----
-* Implement "stop when recursion level N is reached" 
-* Improve link extraction, now only looks at href attribute values
+TODO
+-----------
+
+* Improve and simplify logging and log configuration
+* Proxy support

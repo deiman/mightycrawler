@@ -3,6 +3,7 @@ package no.bekk.mightycrawler;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 
@@ -16,6 +17,8 @@ public class URLManager {
 	private LinkedHashSet<String> urlsToVisit = new LinkedHashSet<String>();
 	private LinkedHashSet<String> urlsVisited = new LinkedHashSet<String>();
 
+	private HashMap<String, Integer> recursionLevel = new HashMap<String, Integer>();
+	
 	private IncludeExcludeFilter urlFilter;
 	
 	static final Log log = LogFactory.getLog(URLManager.class);
@@ -24,18 +27,18 @@ public class URLManager {
 		urlFilter = f;
 	}
 
-	public Collection<String> updateQueues(LinkHolder l) {
-		markURLAsVisited(l.url);
+	public Collection<String> updateQueues(Resource res) {
+		markURLAsVisited(res.url);
 
-		Collection<String> newURLs = l.urls;
-		newURLs = normalizeURLs(newURLs, l.url);
+		Collection<String> newURLs = res.urls;
+		newURLs = normalizeURLs(newURLs, res.url);
 		newURLs = removeKnownURLs(newURLs);
 		newURLs = filterURLs(newURLs);
-		log.info("Page: " + l.url + ", urls added to queue: " + newURLs.size());
+		log.info("Page: " + res.url + ", urls added to queue: " + newURLs.size());
 
 		addNewURLs(newURLs);
-		log.info("Urls visited: " + urlsVisited.size());
-		log.info("Urls to visit: " + urlsToVisit.size());
+		log.debug("Urls visited: " + urlsVisited.size());
+		log.debug("Urls to visit: " + urlsToVisit.size());
 		
 		return newURLs;
 	}

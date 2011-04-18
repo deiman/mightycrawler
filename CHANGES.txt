@@ -1,0 +1,14 @@
+
+Version 0.2, apr 18, 2011
+
+* Fixed a timeout bug (now using response timeout instead of socket connect timeout)
+* Support for both http and https protocols
+* Support for terminating crawler after N recursion levels of crawling
+* Config file can be specified as command line parameter
+* Some more examples in the provided crawler.properties file
+* Restructured code to support various filters (crawling rules)
+* Upgraded HttpClient version to 4.1.1 and HttpCore to 4.1
+
+Version 0.1, apr 6, 2011
+
+* Initial release

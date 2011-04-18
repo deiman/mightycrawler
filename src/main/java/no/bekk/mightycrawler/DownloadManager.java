@@ -8,27 +8,27 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.HttpClient;
-import org.apache.http.conn.ClientConnectionManager;
-import org.apache.http.conn.params.ConnManagerParams;
-import org.apache.http.conn.params.ConnPerRouteBean;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 
 public class DownloadManager extends Thread {
 
 	private HttpClient httpClient;
-	private ClientConnectionManager cm;
+	private ThreadSafeClientConnManager cm;
 
 	private ExecutorService workerService = null;
 	private CompletionService<Resource> completionService = null;
@@ -39,7 +39,7 @@ public class DownloadManager extends Thread {
 	private ParserManager p;
 	
 	public int urlsDownloaded;
-	public int queueSize;
+	public int recursionLevel;
 	
 	static final Log log = LogFactory.getLog(DownloadManager.class);
 
@@ -49,18 +49,17 @@ public class DownloadManager extends Thread {
 		this.s = s;
 
 		HttpParams params = new BasicHttpParams();
-
-		ConnManagerParams.setMaxTotalConnections(params, c.downloadThreads);
-		ConnPerRouteBean cpr = new ConnPerRouteBean(c.downloadThreads);
-		ConnManagerParams.setMaxConnectionsPerRoute(params, cpr);
-		ConnManagerParams.setTimeout(params, 5000);
-		
+		HttpConnectionParams.setSoTimeout(params, c.responseTimeout * 1000);
 		HttpProtocolParams.setUserAgent(params, c.userAgent);
         
 		SchemeRegistry schemeRegistry = new SchemeRegistry();
-		schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), c.httpPort));
+		schemeRegistry.register(new Scheme("http", c.httpPort, PlainSocketFactory.getSocketFactory()));
+		schemeRegistry.register(new Scheme("https", 443, SSLSocketFactory.getSocketFactory()));
         
-		cm = new ThreadSafeClientConnManager(params, schemeRegistry);
+		cm = new ThreadSafeClientConnManager(schemeRegistry);
+		cm.setDefaultMaxPerRoute(c.downloadThreads);
+		cm.setMaxTotal(c.downloadThreads);
+		
 		httpClient = new DefaultHttpClient(cm, params);
 				
 		workerService = Executors.newFixedThreadPool(c.downloadThreads);
@@ -71,16 +70,21 @@ public class DownloadManager extends Thread {
 		this.p = p;
 	}
 	
-	public void addToQueue(String url) {
-		completionService.submit(new DownloadWorker(httpClient, url, c));
-		log.debug("Added downloading of " + url + " to queue.");
-		queueSize++;
+	public void addToQueue(Resource res) {
+		completionService.submit(new DownloadWorker(httpClient, res, c));
+		log.debug("Added downloading of " + res.url + " to queue.");
 	}
 
-	public void addToQueue(Collection<String> URLs) {
+	public void addToQueue(Collection<String> URLs, int recursionLevel) {
 		for (String url : URLs) {
-			addToQueue(url);
+			Resource res = new Resource(url);
+			res.recursionLevel = recursionLevel;
+			addToQueue(res);
 		}
+	}
+	
+	public int getQueueSize() {
+		return ((ThreadPoolExecutor) workerService).getQueue().size();
 	}
 	
 	public boolean isTerminated() {
@@ -93,20 +97,23 @@ public class DownloadManager extends Thread {
 				Future<Resource> result = completionService.poll(c.crawlerTimeout, TimeUnit.SECONDS);
 				if (result != null) {
 					Resource res = result.get();
-					log.debug("Has processed URL: " + res.url);	
+					log.debug("Has processed URL: " + res.url);
+					log.info("Recursion level: " + res.recursionLevel);
+					
 					r.registerDownload(res);
 					if (res.doStore) {
 						s.addToQueue(res);
 					}
-					if (res.doParse) {
+					if (res.doExtract) {
 						p.addToQueue(res);
 					}
 					urlsDownloaded++;
-					queueSize--;
+					recursionLevel = res.recursionLevel;
 				} else {
-					log.info("Stopping, reached crawlerTimeout.");
+					log.info("Queue size was: " + getQueueSize());
+					log.info("Stopping, no download completed within " + c.crawlerTimeout + " seconds.");
 					List<Runnable> queuedTasks = workerService.shutdownNow();
-					log.debug("Cancelling " + queuedTasks.size() + " downloads.");					
+					log.info("Cancelling " + queuedTasks.size() + " downloads.");
 				}
 			} catch (RejectedExecutionException ree) {
 	        	// This exception is harmless here. Do nothing.
@@ -116,6 +123,12 @@ public class DownloadManager extends Thread {
 			
 			if (urlsDownloaded == c.maxPages) {
 				log.info("Stopping, reached maxPages.");
+				List<Runnable> queuedTasks = workerService.shutdownNow();
+				log.debug("Cancelling " + queuedTasks.size() + " downloads.");
+			}
+
+			if (recursionLevel > c.maxRecursion) {
+				log.info("Stopping, reached maxRecursion.");
 				List<Runnable> queuedTasks = workerService.shutdownNow();
 				log.debug("Cancelling " + queuedTasks.size() + " downloads.");
 			}

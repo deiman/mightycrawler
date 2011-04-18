@@ -33,7 +33,7 @@ public class Report {
 
 			write("DROP TABLE downloads IF EXISTS");
 			write("DROP TABLE links IF EXISTS");
-			write("CREATE TABLE downloads ( url VARCHAR(4095), http_code INTEGER default 0, response_time INTEGER default 0, downloaded_at DATETIME default NOW, downloaded BOOLEAN)");
+			write("CREATE TABLE downloads ( url VARCHAR(4095), http_code INTEGER default 0, content_type VARCHAR(255), response_time INTEGER default 0, downloaded_at DATETIME default NOW, downloaded BOOLEAN)");
 			write("CREATE TABLE links ( url_from VARCHAR(4095), url_to VARCHAR(4095))");
 		} catch (Exception e) {
 			log.error("Error setting up database: " + e.getMessage());
@@ -45,8 +45,8 @@ public class Report {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String timeString = sdf.format(res.timeStamp);
 		// TODO: Escaping
-		write("INSERT INTO downloads (url, http_code, response_time, downloaded_at, downloaded) values ('" 
-				+ res.url + "', " + res.responseCode + ", " + res.responseTime + ", '" + timeString + "', " + res.doStore + ")");
+		write("INSERT INTO downloads (url, http_code, content_type, response_time, downloaded_at, downloaded) values ('" 
+				+ res.url + "', " + res.responseCode + ", '" + res.contentType + "', " + res.responseTime + ", '" + timeString + "', " + res.doStore + ")");
 	}
 
 	public void registerOutboundLinks(String url, Collection<String> outlinks) {

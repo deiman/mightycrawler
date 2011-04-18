@@ -1,6 +1,8 @@
 package no.bekk.mightycrawler;
 
+import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedHashSet;
 
 public class Resource {
 	public String url = "";
@@ -18,8 +20,10 @@ public class Resource {
 //	public Date lastModified = new Date();
 
 	public boolean doStore = false;
-	public boolean doCollect = false;
-	public boolean doParse = false;
+	public boolean doExtract = false;
+	
+	public int recursionLevel = 0;
+	public Collection<String> urls = new LinkedHashSet<String>();
 	
 	public Resource(String url) {
 		this.url = url;

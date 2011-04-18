@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -16,8 +17,6 @@ public class StorageManager extends Thread {
 	private ExecutorService workerService = null;
 	private CompletionService<String> completionService = null;
 	private Configuration c;
-	
-	public int queueSize;
 
 	static final Log log = LogFactory.getLog(StorageManager.class);
 
@@ -30,8 +29,12 @@ public class StorageManager extends Thread {
 	public void addToQueue(Resource res) {
 		completionService.submit(new StorageWorker(c, res.content, res.url));
 		log.debug("Added storing of " + res.url + " to queue.");
-		queueSize++;
 	}
+	
+	public int getQueueSize() {
+		return ((ThreadPoolExecutor) workerService).getQueue().size();
+	}
+
 
 	public void run() {
 		while (!workerService.isShutdown()) {
@@ -39,7 +42,6 @@ public class StorageManager extends Thread {
 				Future<String> result = completionService.take();
 				String status = result.get();
 				log.debug("Done saving to disk. Status: " + status);
-				queueSize--;
 			} catch (RejectedExecutionException ree) {
 	        	// This exception is harmless here. Do nothing.
 			} catch (InterruptedException e) {

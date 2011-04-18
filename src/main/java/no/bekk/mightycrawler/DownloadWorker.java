@@ -1,6 +1,7 @@
 package no.bekk.mightycrawler;
 
 import java.io.FileWriter;
+import java.net.SocketTimeoutException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -22,24 +23,23 @@ public class DownloadWorker implements Callable<Resource> {
 	
 	private HttpClient httpClient;
 	private HttpContext context;
-	private String url;
+	private Resource res;
 
 	private Configuration c;
 	
 	static final Log log = LogFactory.getLog(DownloadWorker.class);
 	
-    public DownloadWorker(HttpClient httpClient, String url, Configuration c) {
+    public DownloadWorker(HttpClient httpClient, Resource res, Configuration c) {
         this.httpClient = httpClient;
         this.context = new BasicHttpContext();
-        this.url = url;
+        this.res = res;
         this.c = c;
     }
     
     public Resource call() {
-    	Resource res = new Resource(url);
-    	HttpGet httpGet = new HttpGet(url);
+    	HttpGet httpGet = new HttpGet(res.url);
         try {
-        	log.debug("Fetching " + url + ", delay = " + c.downloadDelay + " seconds.");
+        	log.debug("Fetching " + res.url + ", delay = " + c.downloadDelay + " seconds.");
         	Thread.sleep(c.downloadDelay * 1000);
 	    	
 			long startTime = System.currentTimeMillis();
@@ -62,35 +62,33 @@ public class DownloadWorker implements Callable<Resource> {
         			}
 	    			handleContent(entity, res);
 				} else {
-					log.debug("Not fetching page at " + url + ", response code was " + res.responseCode);
+					log.debug("Not fetching page at " + res.url + ", response code was " + res.responseCode);
 				}
-	        	entity.consumeContent();
+	        	EntityUtils.consume(entity);
             }
         } catch (InterruptedException ie) {
         	// Thread interruption is harmless here. Do nothing.
+        } catch (SocketTimeoutException ste) {
+            httpGet.abort();
+            res.responseCode = HttpStatus.SC_REQUEST_TIMEOUT;
+            log.warn("Timeout (" + c.responseTimeout + " seconds) reached when requesting: " + res.url + ", " + ste);
         } catch (Exception e) {
             httpGet.abort();
-            log.error("Error fetching page at : " + url + ", " + e);
+            log.error("Error fetching page at : " + res.url + ", " + e);
         }
         return res;
     }
 
     public void handleContent(HttpEntity entity, Resource res) {
     	res.doStore = c.storeFilter.letsThrough(res.contentType);
-    	res.doParse = c.extractLinkFilter.letsThrough(res.contentType);
-    	res.doCollect = c.collectURLFilter.letsThrough(res.contentType);
+    	res.doExtract = c.extractFilter.letsThrough(res.contentType);
     	
-    	if (res.doStore || res.doParse) {
+    	if (res.doStore || res.doExtract) {
 	    	try {
 	    		res.content = EntityUtils.toString(entity, res.encoding);
 	    	} catch (Exception e) {
 	    		log.error(e);
 	    	}
-    	}
-
-    	if (res.doCollect) {
-	    	log.debug("Content-type matched URL collection filter. Adding " + url + " to file containing list of URLs.");
-	    	addURLToFile(c.listFile, url);    		
     	}
 	}
 
