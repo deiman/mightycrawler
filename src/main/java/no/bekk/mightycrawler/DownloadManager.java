@@ -11,7 +11,10 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.http.client.HttpClient;
+import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
@@ -26,7 +29,7 @@ import org.apache.log4j.Logger;
 
 public class DownloadManager extends Thread {
 
-	private HttpClient httpClient;
+	private DefaultHttpClient httpClient;
 	private ThreadSafeClientConnManager cm;
 
 	private ExecutorService workerService = null;
@@ -58,8 +61,19 @@ public class DownloadManager extends Thread {
 		cm = new ThreadSafeClientConnManager(schemeRegistry);
 		cm.setDefaultMaxPerRoute(c.downloadThreads);
 		cm.setMaxTotal(c.downloadThreads);
-		
+
 		httpClient = new DefaultHttpClient(cm, params);
+
+		if (!"".equals(c.proxyHost)) {
+			HttpHost proxy = new HttpHost(c.proxyHost, c.proxyPort);
+            httpClient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
+
+    		if (!"".equals(c.proxyUsername)) {
+    			AuthScope as = new AuthScope(c.proxyHost, c.proxyPort);
+    			UsernamePasswordCredentials upc = new UsernamePasswordCredentials(c.proxyUsername, c.proxyPassword);
+    			httpClient.getCredentialsProvider().setCredentials(as, upc);
+    		}
+		}
 				
 		workerService = Executors.newFixedThreadPool(c.downloadThreads);
 		completionService = new ExecutorCompletionService<Resource>(workerService);

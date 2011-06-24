@@ -52,6 +52,14 @@ All options for running mightycrawler are given in the crawler.properties file:
 
 * defaultEncoding: Use this encoding when storing content unless the content-type in the HTTP response header specifies otherwise.
 
+* proxyHost: Host name to a proxy server. Defaults to not using any proxy (if nothing is specified).
+
+* proxyPort: Port number to connect to the proxy, if any. Defaults to 8080 (if nothing is specified).
+
+* proxyUsername: Username to authenticate against the proxy, if any. NOTE: Experimental.
+
+* proxyPassword: Password to authenticate against the proxy, if any. NOTE: Experimental.
+
 * downloadThreads: Number of threads when getting content from server.
 
 * parseThreads: Number of threads for parsing content, ie scanning for URLs.
@@ -88,4 +96,4 @@ url_from VARCHAR(4095) | url_to VARCHAR(4095)
 TODO
 -----------
 
-* Proxy support
+* Proxy authentication support

@@ -27,6 +27,11 @@ public class Configuration {
 	public String defaultEncoding = "";
 	public int httpPort = 80;
 	
+	public String proxyHost = "";
+	public int proxyPort;
+	public String proxyUsername = "";
+	public String proxyPassword = "";
+	
 	public int downloadThreads;
 	public int parseThreads;
 	public int saveThreads;
@@ -81,6 +86,16 @@ public class Configuration {
 			defaultPage = p.getProperty("defaultPage", "index.html");
 			defaultEncoding = p.getProperty("defaultEncoding", "UTF-8");
 
+			proxyHost = p.getProperty("proxyHost", "");
+
+			String pPort = p.getProperty("proxyPort", "");
+			if ("".equals(pPort)) {
+				pPort = "8080";
+			}
+			proxyPort = Integer.parseInt(pPort);
+			proxyUsername = p.getProperty("proxyUsername", "");
+			proxyPassword = p.getProperty("proxyPassword", "");
+
 			downloadThreads = Integer.parseInt(p.getProperty("downloadThreads", "1"));
 			parseThreads = Integer.parseInt(p.getProperty("parseThreads", "1"));
 			saveThreads = Integer.parseInt(p.getProperty("saveThreads", "1"));
@@ -112,7 +127,7 @@ public class Configuration {
 			System.err.println("Aborting.");
 			System.exit(1);
 		} catch (NumberFormatException nfe) {
-			log.error("Error reading configuration value: " + nfe.getMessage());
+			log.error("Error reading configuration value: " + nfe);
 		} finally {
 			try {
 				if (fr != null) fr.close();

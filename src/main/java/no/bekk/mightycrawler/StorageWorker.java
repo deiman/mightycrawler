@@ -33,7 +33,8 @@ public class StorageWorker implements Callable<String> {
 			FileWriter fw = null;
 			try {
 				boolean created = new File(c.outputDirectory + directory).mkdirs();
-				if (!created) {
+				boolean exists = new File(c.outputDirectory + directory).exists();
+				if (!exists) {
 					log.error("Error creating content output directory: " + c.outputDirectory);
 	    			return "ERROR";					
 				}

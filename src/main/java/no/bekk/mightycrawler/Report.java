@@ -59,13 +59,14 @@ public class Report {
 		BufferedWriter out = null;
 		try {
 			boolean created = new File(logDir).mkdirs();
-			if (!created) {
-				log.error("Error creating report output directory: " + logDir);
-				return null;
+			boolean exists = new File(logDir).exists();
+			if (!exists) {
+				log.error("Report output directory does not exist: " + logDir);
+				return out;
 			}
 			out = new BufferedWriter(new FileWriter(logDir + fileName));
 		} catch (Exception e) {
-			log.error("Error creating report file: " + e.getMessage());
+			log.error("Error creating report file: " + e);
 		}
 		return out;
 	}
@@ -81,7 +82,7 @@ public class Report {
 			}
 			out.close();
 		} catch (Exception e) {
-			log.error("Error creating report file: " + e.getMessage());			
+			log.error("Error creating report file: " + e);			
 		}
 	}
 	
