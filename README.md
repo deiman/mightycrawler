@@ -34,27 +34,27 @@ Configuration
 
 All options for running mightycrawler are given in the crawler.properties file:
 
-* startURL: Where to start crawling. URL must end with a "/".
+* startURL: Where to start crawling. Host names must end with a "/".
 
-* includeURL: Restrict crawling and downloading to URLs matching this regex. Defaults to everything under startURL.
+* includeURL: Restrict crawling to URLs matching this regex. Defaults to everything under startURL.
 
-* excludeURL: Among the included URLs, exclude any matching this regex. Defaults to none (don't exclude any).
+* excludeURL: Among the included URLs, exclude those matching this regex. Defaults to none (don't exclude any).
 
-* extract: Restrict link extraction to content types matching this regex. Defaults to none (if nothing is specified).
+* extract: Extract links from content types matching this regex. Defaults to none (if nothing is specified).
 
-* link: Consinder content matching this regex as a link to a resource. Defaults to none (if nothing is specified).
+* link: Consinder content captured by this regex as links to resources. Defaults to none (if nothing is specified).
 
-* store: Restrict downloading to content types matching this regex. Defaults to none (if nothing is specified).
+* store: Download and save to disk all content types matching this regex. Defaults to none (if nothing is specified).
 
-* userAgent: The user agent the crawler identifies itself as.
+* userAgent: The user agent the crawler reports to be.
 
-* defaultPage: When storing pages to disk, URLs ending with "/" are appended with the file name given here. The URL would else map to a directory name - making storage impossible.
+* defaultPage: When storing pages to disk, URLs ending with "/" must be mapped to a file name. The string given here is appended to the "/".
 
-* defaultEncoding: Use this encoding to store content unless content-type is specified in the HTTP response header.
+* defaultEncoding: Use this encoding when storing content unless the content-type in the HTTP response header specifies otherwise.
 
-* downloadThreads: Number of threads for downloading.
+* downloadThreads: Number of threads when getting content from server.
 
-* parseThreads: Number of threads for parsing content, looking for URLs.
+* parseThreads: Number of threads for parsing content, ie scanning for URLs.
 
 * saveThreads: Number of threads used for saving content to disk.
 
@@ -62,7 +62,9 @@ All options for running mightycrawler are given in the crawler.properties file:
 
 * maxRecursion: Stop when reaching this recursion level.
 
-* downloadDelay: Each download thread waits this number of seconds before it starts.
+* downloadDelay: For each resource, pause of this number of seconds before downloading.
+
+* responseTimeout: Wait this number of seconds for a server response before continuing.
 
 * crawlerTimeout: Stop crawling if no new URLs are discovered within this number of seconds.
 
@@ -86,5 +88,4 @@ url_from VARCHAR(4095) | url_to VARCHAR(4095)
 TODO
 -----------
 
-* Improve and simplify logging and log configuration
 * Proxy support

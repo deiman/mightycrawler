@@ -5,16 +5,20 @@ import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
+
 public class IncludeExcludeFilter {
 	private Pattern includeFilter;
 	private Pattern excludeFilter;
+
+	static final Logger log = Logger.getLogger(IncludeExcludeFilter.class);
 	
-	// TODO: Collapse include/exclude-patterns
 	public IncludeExcludeFilter(String include, String exclude) {
 		includeFilter = Pattern.compile(include);
 		excludeFilter = Pattern.compile(exclude);
 	}
-	
+
+	// TODO: Convenience method to filter lists of items
 	public boolean letsThrough(String item) {
 		Matcher includeMatcher = includeFilter.matcher(item);
 	    if (includeMatcher.matches()) {

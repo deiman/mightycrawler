@@ -9,8 +9,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 public class StorageManager extends Thread {
 	
@@ -18,7 +17,7 @@ public class StorageManager extends Thread {
 	private CompletionService<String> completionService = null;
 	private Configuration c;
 
-	static final Log log = LogFactory.getLog(StorageManager.class);
+	static final Logger log = Logger.getLogger(StorageManager.class);
 
 	public StorageManager(Configuration c) {		
 		this.c = c;

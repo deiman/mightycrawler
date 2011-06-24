@@ -6,8 +6,7 @@ import java.io.IOException;
 import java.util.concurrent.Callable;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 public class StorageWorker implements Callable<String> {
 
@@ -16,7 +15,7 @@ public class StorageWorker implements Callable<String> {
 
 	private Configuration c;
 	
-	static final Log log = LogFactory.getLog(StorageWorker.class);
+	static final Logger log = Logger.getLogger(StorageWorker.class);
 
 	public StorageWorker(Configuration c, String page, String url) {
 		this.c = c;
@@ -34,6 +33,10 @@ public class StorageWorker implements Callable<String> {
 			FileWriter fw = null;
 			try {
 				boolean created = new File(c.outputDirectory + directory).mkdirs();
+				if (!created) {
+					log.error("Error creating content output directory: " + c.outputDirectory);
+	    			return "ERROR";					
+				}
     			fw = new FileWriter(c.outputDirectory + fullPath);
     			fw.write(page);
     			log.debug("Wrote page at: " + url + " to file: " + c.outputDirectory + fullPath);

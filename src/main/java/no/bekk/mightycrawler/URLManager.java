@@ -3,25 +3,21 @@ package no.bekk.mightycrawler;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 
 public class URLManager {
 
 	private LinkedHashSet<String> urlsToVisit = new LinkedHashSet<String>();
 	private LinkedHashSet<String> urlsVisited = new LinkedHashSet<String>();
-
-	private HashMap<String, Integer> recursionLevel = new HashMap<String, Integer>();
 	
 	private IncludeExcludeFilter urlFilter;
 	
-	static final Log log = LogFactory.getLog(URLManager.class);
+	static final Logger log = Logger.getLogger(URLManager.class);
 
 	public URLManager(IncludeExcludeFilter f) {
 		urlFilter = f;

@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
+import org.apache.log4j.xml.DOMConfigurator;
 
 public class Crawler {
 
@@ -16,9 +16,12 @@ public class Crawler {
 	private DownloadManager download = null;
 	private ParserManager parse = null;
 	
-	static final Log log = LogFactory.getLog(Crawler.class);
+	static final Logger log = Logger.getLogger(Crawler.class);
 	
 	public void init(String propertiesFile) {
+		
+		DOMConfigurator.configure("log4j.xml");
+		
 		config = new Configuration(propertiesFile);
 		report = new Report();
 		

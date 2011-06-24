@@ -8,8 +8,6 @@ import java.util.Locale;
 import java.util.concurrent.Callable;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -18,6 +16,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
+import org.apache.log4j.Logger;
 
 public class DownloadWorker implements Callable<Resource> {
 	
@@ -27,7 +26,7 @@ public class DownloadWorker implements Callable<Resource> {
 
 	private Configuration c;
 	
-	static final Log log = LogFactory.getLog(DownloadWorker.class);
+	static final Logger log = Logger.getLogger(DownloadWorker.class);
 	
     public DownloadWorker(HttpClient httpClient, Resource res, Configuration c) {
         this.httpClient = httpClient;
@@ -72,6 +71,9 @@ public class DownloadWorker implements Callable<Resource> {
             httpGet.abort();
             res.responseCode = HttpStatus.SC_REQUEST_TIMEOUT;
             log.warn("Timeout (" + c.responseTimeout + " seconds) reached when requesting: " + res.url + ", " + ste);
+        } catch (IllegalStateException ise) {
+            httpGet.abort();
+            log.warn("Not fetching page at : " + res.url + ", " + ise);
         } catch (Exception e) {
             httpGet.abort();
             log.error("Error fetching page at : " + res.url + ", " + e);

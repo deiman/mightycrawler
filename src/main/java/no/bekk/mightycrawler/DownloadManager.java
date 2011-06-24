@@ -11,8 +11,6 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.HttpClient;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
@@ -24,6 +22,7 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
+import org.apache.log4j.Logger;
 
 public class DownloadManager extends Thread {
 
@@ -41,7 +40,7 @@ public class DownloadManager extends Thread {
 	public int urlsDownloaded;
 	public int recursionLevel;
 	
-	static final Log log = LogFactory.getLog(DownloadManager.class);
+	static final Logger log = Logger.getLogger(DownloadManager.class);
 
 	public DownloadManager(Configuration c, Report r, StorageManager s) {
 		this.c = c;
@@ -102,12 +101,12 @@ public class DownloadManager extends Thread {
 					
 					r.registerDownload(res);
 					if (res.doStore) {
+						urlsDownloaded++;
 						s.addToQueue(res);
 					}
 					if (res.doExtract) {
 						p.addToQueue(res);
 					}
-					urlsDownloaded++;
 					recursionLevel = res.recursionLevel;
 				} else {
 					log.info("Queue size was: " + getQueueSize());

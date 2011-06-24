@@ -16,12 +16,11 @@ import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 public class Report {
 
-	static final transient Log log = LogFactory.getLog(Report.class);
+	static final Logger log = Logger.getLogger(Report.class);
 
 	private Driver hsqldbDriver = null;
 	private String connectionString = "jdbc:hsqldb:mem:db";
@@ -60,6 +59,10 @@ public class Report {
 		BufferedWriter out = null;
 		try {
 			boolean created = new File(logDir).mkdirs();
+			if (!created) {
+				log.error("Error creating report output directory: " + logDir);
+				return null;
+			}
 			out = new BufferedWriter(new FileWriter(logDir + fileName));
 		} catch (Exception e) {
 			log.error("Error creating report file: " + e.getMessage());
@@ -83,13 +86,15 @@ public class Report {
 	}
 	
 	public void createReport(String logDir, Collection<String> reportList) {
-		for (String report : reportList) {
-			String sql = report.split("@")[0];
-			String fileName = report.split("@")[1];
-			printReport(createReportStream(logDir, fileName), read(sql));
+		if (!reportList.isEmpty()) {
+			for (String report : reportList) {
+				String sql = report.split("@")[0];
+				String fileName = report.split("@")[1];
+				printReport(createReportStream(logDir, fileName), read(sql));
+			}
 		}
 	}
-
+	
 	public Collection<LinkedHashMap<String, String>> read(String sql){
 		Collection<LinkedHashMap<String, String>> a = new ArrayList<LinkedHashMap<String, String>>();
 		Connection c = null;

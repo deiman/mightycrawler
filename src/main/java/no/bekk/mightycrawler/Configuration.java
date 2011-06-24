@@ -51,7 +51,7 @@ public class Configuration {
 	public IncludeExcludeFilter storeFilter;
 	
 	static final Logger log = Logger.getLogger(Configuration.class);
-		
+	
 	public Configuration(String filename) {
 		init(filename);
 	}
@@ -94,8 +94,13 @@ public class Configuration {
 			listFile = p.getProperty("listFile", "");
 			outputDirectory = p.getProperty("outputDirectory", System.getProperty("java.io.tmpdir"));
 			reportDirectory = p.getProperty("reportDirectory", System.getProperty("java.io.tmpdir"));
-			
-			reportSQL = Arrays.asList(p.getProperty("reportSQL").split("\\|"));
+
+			String sql = p.getProperty("reportSQL", "");
+			if (sql.length() == 0) {
+				reportSQL = new ArrayList<String>();
+			} else {
+				reportSQL = Arrays.asList(sql.split("\\|"));
+			}			
 			
 			crawlFilter = new IncludeExcludeFilter(includeCrawl, excludeCrawl);
 			extractFilter = new IncludeExcludeFilter(extract, "");

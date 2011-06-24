@@ -10,8 +10,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 public class ParserManager extends Thread {
 
@@ -23,7 +22,8 @@ public class ParserManager extends Thread {
 	private DownloadManager d;
 	private Report r;
 	
-	static final Log log = LogFactory.getLog(ParserManager.class);
+	static final Logger log = Logger.getLogger(ParserManager.class);
+
 
 	public ParserManager(Configuration c, DownloadManager d, Report r) {
 		this.d = d;
