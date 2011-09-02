@@ -118,7 +118,7 @@ public class DownloadManager extends Thread {
 						urlsDownloaded++;
 						s.addToQueue(res);
 					}
-					if (res.doExtract) {
+					if (res.doExtract && c.crawlingEnabled) {
 						p.addToQueue(res);
 					}
 					recursionLevel = res.recursionLevel;

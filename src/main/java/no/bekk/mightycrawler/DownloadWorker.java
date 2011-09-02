@@ -48,7 +48,7 @@ public class DownloadWorker implements Callable<Resource> {
 	    	
         	HttpEntity entity = response.getEntity();
         	res.responseCode = response.getStatusLine().getStatusCode();
-			res.encoding = c.defaultEncoding;
+			res.encoding = c.defaultHTTPEncoding;
 			
     		// TODO: handle redirects
         	if (entity != null) {        		
@@ -83,7 +83,7 @@ public class DownloadWorker implements Callable<Resource> {
 
     public void handleContent(HttpEntity entity, Resource res) {
     	res.doStore = c.storeFilter.letsThrough(res.contentType);
-    	res.doExtract = c.extractFilter.letsThrough(res.contentType);
+    	res.doExtract = c.crawlingEnabled && c.extractFilter.letsThrough(res.contentType);
     	
     	if (res.doStore || res.doExtract) {
 	    	try {
@@ -107,12 +107,11 @@ public class DownloadWorker implements Callable<Resource> {
     
 	public Date parseTimestamp(String headerValue) {
 		SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
-		Date d;
+		Date d = new Date();
 		try {
 			d = sdf.parse(headerValue);
 		} catch (Exception e) {
 			log.warn("Could not parse date from response: " + headerValue + ", using current time instead.");
-			d = new Date();
 		}
 		return d;
 	}

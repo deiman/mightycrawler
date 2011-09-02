@@ -20,7 +20,7 @@ public class Crawler {
 	
 	public void init(String propertiesFile) {
 		
-		DOMConfigurator.configure("log4j.xml");
+		DOMConfigurator.configureAndWatch("log4j.xml", 5000);
 		
 		config = new Configuration(propertiesFile);
 		report = new Report();
@@ -41,7 +41,7 @@ public class Crawler {
 	}
 	
 	public void start() {
-		log.info("Crawling starts...");
+		log.info("Starting up...");
 
 		download.setParserManager(parse);
 		
@@ -49,10 +49,12 @@ public class Crawler {
 		storage.start();
  		download.start(); 		
 
- 		Resource res = new Resource(config.startURL);
- 		res.recursionLevel = 0;
- 		download.addToQueue(res);
-
+ 		for (String url : config.startURLs) {
+ 			Resource res = new Resource(url);
+ 	 		res.recursionLevel = 0;
+ 	 		download.addToQueue(res);			
+ 		}
+ 
  		while (!download.isTerminated()) {
  			try {
 				Thread.sleep(10000);

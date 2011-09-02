@@ -8,7 +8,7 @@ Warning: Mightycrawler is experimental. Some features are not fully implemented.
 
     git clone git://github.com/kristofd/mightycrawler.git
     cd mightycrawler
-    mvn clean package
+    mvn clean install assembly:single
 
 
 Description
@@ -26,7 +26,7 @@ After downloading and building, edit crawler.properties to suit your needs.
 
 Then run mightycrawler by typing
 
-	java -jar mightycrawler.jar [myconfig.properties]
+	java -jar mightycrawler-jar-with-dependencies.jar [myconfig.properties]
 
 
 Configuration
@@ -40,6 +40,8 @@ All options for running mightycrawler are given in the crawler.properties file:
 
 * excludeURL: Among the included URLs, exclude those matching this regex. Defaults to none (don't exclude any).
 
+* urlFile: visit all the URLs in this file (one URL per line). if provided, will override all of the above settings and turn off crawling.
+
 * extract: Extract links from content types matching this regex. Defaults to none (if nothing is specified).
 
 * link: Consinder content captured by this regex as links to resources. Defaults to none (if nothing is specified).
@@ -47,8 +49,6 @@ All options for running mightycrawler are given in the crawler.properties file:
 * store: Download and save to disk all content types matching this regex. Defaults to none (if nothing is specified).
 
 * userAgent: The user agent the crawler reports to be.
-
-* defaultPage: When storing pages to disk, URLs ending with "/" must be mapped to a file name. The string given here is appended to the "/".
 
 * defaultEncoding: Use this encoding when storing content unless the content-type in the HTTP response header specifies otherwise.
 

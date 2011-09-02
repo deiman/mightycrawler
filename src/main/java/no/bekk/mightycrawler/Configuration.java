@@ -9,13 +9,17 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Properties;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 public class Configuration {
 
-	public String startURL = "";
+	public Collection<String> startURLs = new ArrayList<String>();
 	public String includeCrawl = "";
 	public String excludeCrawl = "";
+
+	public boolean crawlingEnabled = true;
 	
 	public String extract = "";
 	public String link = "";
@@ -23,8 +27,8 @@ public class Configuration {
 	public String collect = "";
 
 	public String userAgent = "";
-	public String defaultPage = "";	
-	public String defaultEncoding = "";
+	public String defaultHTTPEncoding = "";
+	public String defaultFileEncoding = "";
 	public int httpPort = 80;
 	
 	public String proxyHost = "";
@@ -35,8 +39,6 @@ public class Configuration {
 	public int downloadThreads;
 	public int parseThreads;
 	public int saveThreads;
-	
-	public boolean isWindows = File.separator.equals("\\");
 
 	public int maxPages;
 	public int maxRecursion;
@@ -68,13 +70,28 @@ public class Configuration {
 			fr = new FileReader(fileName);			
 			p.load(fr);
 		
-			startURL = p.getProperty("startURL");
-			int port = new URL(startURL).getPort();
+			String start = p.getProperty("startURLs", "");
+			startURLs = Arrays.asList(start.split("\\|"));
+
+			String urlFile = p.getProperty("urlFile", "");
+			File f = new File(urlFile);
+			if (f.exists()) {
+				startURLs = FileUtils.readLines(f);				
+				crawlingEnabled = false;
+			}
+
+			String first = startURLs.iterator().next();
+			int port = new URL(first).getPort();
 			if (port != -1) {
 				httpPort = port;
 			}
-				
-			includeCrawl = p.getProperty("includeCrawl", startURL + "(.*)");
+	 
+	 		String[] inc = start.split("\\|");
+			String defaultIncludes = StringUtils.join(inc, ".*|") + ".*";
+			if (!crawlingEnabled) {
+				defaultIncludes = "";
+			}
+			includeCrawl = p.getProperty("includeCrawl", defaultIncludes);
 			excludeCrawl = p.getProperty("excludeCrawl", "");
 
 			extract = p.getProperty("extract", "");
@@ -83,8 +100,8 @@ public class Configuration {
 			collect = p.getProperty("collect", "");
 			
 			userAgent = p.getProperty("userAgent", "");
-			defaultPage = p.getProperty("defaultPage", "index.html");
-			defaultEncoding = p.getProperty("defaultEncoding", "UTF-8");
+			defaultHTTPEncoding = p.getProperty("defaultHTTPEncoding", "UTF-8");
+			defaultFileEncoding = p.getProperty("defaultFileEncoding", "UTF-8");
 
 			proxyHost = p.getProperty("proxyHost", "");
 
@@ -123,7 +140,7 @@ public class Configuration {
 			storeFilter = new IncludeExcludeFilter(store, "");
 			
 		} catch (IOException ioe) {
-			System.err.println("\nError reading configuration file: " + ioe.getMessage());
+			System.err.println("\nError reading configuration file: " + ioe);
 			System.err.println("Aborting.");
 			System.exit(1);
 		} catch (NumberFormatException nfe) {
